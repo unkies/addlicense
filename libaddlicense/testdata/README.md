@@ -1,0 +1,1 @@
+The test data is copied from [google/addlicense](https://github.com/google/addlicense)
