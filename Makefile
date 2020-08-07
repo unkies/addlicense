@@ -7,3 +7,7 @@ bin/addlicense:
 .PHONY: clean
 clean:
 	rm -rf bin
+
+.PHONY: dogfood
+dogfood: bin/addlicense
+	./bin/addlicense --license LICENSE --ignore testdata .

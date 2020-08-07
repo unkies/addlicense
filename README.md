@@ -45,22 +45,34 @@ go clean -i github.com/yihuaf/addlicense/cmd/addlicense
 To use, first create a file with the license header you want to add. See
 `./LICENSE` as an example of the MIT license.
 ```bash
-addlicense --license <license file> <root of source code>
+addlicense --license <license file> --ignore <if any ignore patterns> <root of source code>
 ```
 
-For usage, consult `addlicense -h`.
-```txt
-Usage:
-  addlicense [flags] path...
-
-Flags:
-  -h, --help             help for addlicense
-      --license string   Path to license file
-```
+For usage, consult `addlicense -h` and `make dogfood` as an example of adding
+`./LICENSE` to this repo.
 
 ### Lib
 
 Follow the reference [here](https://pkg.go.dev/mod/github.com/yihuaf/addlicense)
+
+```golang
+import "github.com/yihuaf/addlicense/libaddlicense"
+
+// Read the license file
+license, _ := ioutil.ReadFile("./LICENSE")
+
+// Add licenses to a project root, but ignore certain files
+srcRoot := "."
+ignore := []string{"testdata"}
+_ := libaddlicense.AddLicenseWithIgnore(srcRoot, license, ignore)
+// Or no need to ignore
+_ := libaddlicense.AddLicense(srcRoot, license)
+
+// Add license to a single file
+filePath := "./cmd/addlicense/main.go"
+_ := libaddlicense.AddLicenseSingle(filePath, license)
+
+```
 
 ## License
 
