@@ -1,4 +1,4 @@
-module github.com/yihuaf/addlicense
+module github.com/unkies/addlicense
 
 go 1.14
 

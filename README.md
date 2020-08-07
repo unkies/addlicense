@@ -33,13 +33,13 @@ This project can be consumed either as a CLI or as a lib.
 
 To install:
 ```bash
-go get -u github.com/yihuaf/addlicense/cmd/addlicense
+go get -u github.com/unkies/addlicense/cmd/addlicense
 ```
 Note: You may need to add you `$GOPATH/bin` to your `$PATH`.
 
 To uninstall:
 ```bash
-go clean -i github.com/yihuaf/addlicense/cmd/addlicense
+go clean -i github.com/unkies/addlicense/cmd/addlicense
 ```
 
 To use, first create a file with the license header you want to add. See
@@ -53,10 +53,10 @@ For usage, consult `addlicense -h` and `make dogfood` as an example of adding
 
 ### Lib
 
-Follow the reference [here](https://pkg.go.dev/mod/github.com/yihuaf/addlicense)
+Follow the reference [here](https://pkg.go.dev/mod/github.com/unkies/addlicense)
 
 ```golang
-import "github.com/yihuaf/addlicense/libaddlicense"
+import "github.com/unkies/addlicense/libaddlicense"
 
 // Read the license file
 license, _ := ioutil.ReadFile("./LICENSE")

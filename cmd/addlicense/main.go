@@ -28,7 +28,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"github.com/yihuaf/addlicense/libaddlicense"
+	"github.com/unkies/addlicense/libaddlicense"
 )
 
 func main() {
