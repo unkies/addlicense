@@ -31,6 +31,18 @@ This project can be consumed either as a CLI or as a lib.
 
 ### CLI
 
+To install:
+```bash
+go get -u github.com/yihuaf/addlicense/cmd/addlicense
+```
+Note: You may need to add you `$GOPATH/bin` to your `$PATH`.
+
+To uninstall:
+```bash
+go clean -i github.com/yihuaf/addlicense/cmd/addlicense
+```
+
+For usage, consult `addlicense -h`.
 ```txt
 Usage:
   addlicense [flags] path...
