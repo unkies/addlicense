@@ -37,11 +37,23 @@ func main() {
 		Short: "CLI used to add license to source files",
 	}
 
-	rootCmd.PersistentPreRun = func(c *cobra.Command, args []string) {
+	rootCmd.PersistentFlags().Bool("debug", false, "Enable debug logging")
+	rootCmd.PersistentPreRunE = func(c *cobra.Command, args []string) error {
 		logrus.SetReportCaller(true)
+		debug, err := c.Flags().GetBool("debug")
+		if err != nil {
+			return err
+		}
+
+		if debug {
+			logrus.SetLevel(logrus.DebugLevel)
+		}
+
+		return nil
 	}
 
 	rootCmd.PersistentFlags().String("license", "", "Path to license file")
+	rootCmd.PersistentFlags().StringArray("ignore", []string{}, "Patterns to ignore. Follow the shell pattern")
 	rootCmd.Args = cobra.MinimumNArgs(1)
 	rootCmd.RunE = func(c *cobra.Command, args []string) error {
 		licensePath, err := c.Flags().GetString("license")
@@ -53,7 +65,18 @@ func main() {
 			return errors.New("License file path can't be empty")
 		}
 
-		if err := run(args, licensePath); err != nil {
+		ignore, err := c.Flags().GetStringArray("ignore")
+		if err != nil {
+			return err
+		}
+
+		logrus.WithFields(logrus.Fields{
+			"root":         args,
+			"license file": licensePath,
+			"ignore":       ignore,
+		}).Debug("Adding license")
+
+		if err := run(args, licensePath, ignore); err != nil {
 			logrus.WithError(err).WithFields(logrus.Fields{
 				"license path": licensePath,
 				"directories":  args,
@@ -66,14 +89,14 @@ func main() {
 	rootCmd.Execute()
 }
 
-func run(dirs []string, licensePath string) error {
+func run(dirs []string, licensePath string, ignore []string) error {
 	license, err := ioutil.ReadFile(licensePath)
 	if err != nil {
 		return err
 	}
 
 	for _, dir := range dirs {
-		if err := libaddlicense.AddLicense(dir, license); err != nil {
+		if err := libaddlicense.AddLicenseWithIgnore(dir, license, ignore); err != nil {
 			return errors.Wrapf(err, "Failed to add license to: %s", dir)
 		}
 	}

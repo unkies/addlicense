@@ -29,6 +29,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"unicode"
 
@@ -36,10 +37,10 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-// AddLicense adds license to all files under the root. It will try to parse the
-// file extension and add the right header accordingly. It will also handle
-// shebang lines correctly.
-func AddLicense(root string, license []byte) error {
+// AddLicenseWithIgnore will add license to all files under the root, except
+// path that matches the ignore patterns. The pattern used are regex patterns
+// and match is implemented using golang regexp package.
+func AddLicenseWithIgnore(root string, license []byte, ignore []string) error {
 	var wg errgroup.Group
 
 	if err := filepath.Walk(root, func(path string, f os.FileInfo, err error) error {
@@ -49,6 +50,18 @@ func AddLicense(root string, license []byte) error {
 
 		if f.IsDir() {
 			return nil
+		}
+
+		for _, pattern := range ignore {
+			matched, err := regexp.MatchString(pattern, path)
+			if err != nil {
+				return err
+			}
+
+			// Ignore path that matches the ignore pattern.
+			if matched {
+				return nil
+			}
 		}
 
 		wg.Go(func() error {
@@ -64,6 +77,13 @@ func AddLicense(root string, license []byte) error {
 	}
 
 	return nil
+}
+
+// AddLicense adds license to all files under the root. It will try to parse the
+// file extension and add the right header accordingly. It will also handle
+// shebang lines correctly.
+func AddLicense(root string, license []byte) error {
+	return AddLicenseWithIgnore(root, license, []string{})
 }
 
 // AddLicenseSingle add the license to a single file in path.

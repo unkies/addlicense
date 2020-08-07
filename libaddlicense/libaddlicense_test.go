@@ -68,7 +68,7 @@ func TestAll(t *testing.T) {
 
 	license, err := ioutil.ReadFile(licensePath)
 	assert.NoError(t, err, "Failed to read license for testing")
-	assert.NoError(t, AddLicense(testDir, license), "Failed to add license")
+	assert.NoError(t, AddLicenseWithIgnore(testDir, license, []string{"ignore"}), "Failed to add license")
 
 	if err := filepath.Walk(testDir, func(path string, f os.FileInfo, err error) error {
 		if err != nil {
