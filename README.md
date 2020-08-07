@@ -42,6 +42,12 @@ To uninstall:
 go clean -i github.com/yihuaf/addlicense/cmd/addlicense
 ```
 
+To use, first create a file with the license header you want to add. See
+`./LICENSE` as an example of the MIT license.
+```bash
+addlicense --license <license file> <root of source code>
+```
+
 For usage, consult `addlicense -h`.
 ```txt
 Usage:
