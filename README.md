@@ -16,7 +16,33 @@ attach a license to all my files. If I am making changes to the license, such
 as updating the year, I will just update a single license file. So I
 simplified the codebase.
 
+## Build
+```bash
+make
+```
+
+## Test
+```bash
+go test -v ./...
+```
+
 ## Usage
+This project can be consumed either as a CLI or as a lib.
+
+### CLI
+
+```txt
+Usage:
+  addlicense [flags] path...
+
+Flags:
+  -h, --help             help for addlicense
+      --license string   Path to license file
+```
+
+### Lib
+
+Follow the reference [here](https://pkg.go.dev/mod/github.com/yihuaf/addlicense)
 
 ## License
 
