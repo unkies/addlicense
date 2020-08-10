@@ -8,9 +8,13 @@ bin/addlicense:
 clean:
 	rm -rf bin
 
-.PHONY: dogfood
-dogfood: bin/addlicense
-	./bin/addlicense --license LICENSE --ignore testdata .
+.PHONY: dogfood_add
+dogfood_add: bin/addlicense
+	./bin/addlicense add --license LICENSE --ignore testdata .
+
+.PHONY: dogfood_remove
+dogfood_add: bin/addlicense
+	./bin/addlicense remove --license LICENSE --ignore testdata .
 
 .PHONY: test
 test:
