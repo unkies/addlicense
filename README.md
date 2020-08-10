@@ -64,13 +64,9 @@ license, _ := ioutil.ReadFile("./LICENSE")
 // Add licenses to a project root, but ignore certain files
 srcRoot := "."
 ignore := []string{"testdata"}
-_ := libaddlicense.AddLicenseWithIgnore(srcRoot, license, ignore)
+_ := libaddlicense.AddLicense(srcRoot, license, ignore)
 // Or no need to ignore
-_ := libaddlicense.AddLicense(srcRoot, license)
-
-// Add license to a single file
-filePath := "./cmd/addlicense/main.go"
-_ := libaddlicense.AddLicenseSingle(filePath, license)
+_ := libaddlicense.AddLicense(srcRoot, license, []string{})
 
 ```
 
