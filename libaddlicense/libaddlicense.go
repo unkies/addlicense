@@ -94,7 +94,7 @@ func AddLicenseSingle(path string, license []byte) error {
 	}
 
 	f, err := ioutil.ReadFile(path)
-	if err != nil || hasLicenseHeader(f) {
+	if err != nil || hasLicenseHeader(f, header) {
 		return err
 	}
 
@@ -215,22 +215,10 @@ func hashBang(b []byte) []byte {
 	return nil
 }
 
-// fileHasLicense reports whether the file at path contains a license header.
-func fileHasLicense(path string) (bool, error) {
-	b, err := ioutil.ReadFile(path)
-	if err != nil || hasLicenseHeader(b) {
-		return false, err
-	}
-	return true, nil
+func hasLicenseHeader(file []byte, header []byte) bool {
+	return bytes.Contains(file, header)
 }
 
-// TODO: is there a better way to check if there is a header in the file?
-func hasLicenseHeader(b []byte) bool {
-	n := 1000
-	if len(b) < 1000 {
-		n = len(b)
-	}
-
-	return bytes.Contains(bytes.ToLower(b[:n]), []byte("copyright")) ||
-		bytes.Contains(bytes.ToLower(b[:n]), []byte("mozilla public"))
+func stripHeader(file []byte, license []byte) []byte {
+	return bytes.ReplaceAll(file, license, []byte{})
 }
