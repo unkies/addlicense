@@ -133,11 +133,11 @@ func removeLicense(path string, license []byte) error {
 	}
 
 	f, err := ioutil.ReadFile(path)
-	if err != nil || hasLicenseHeader(f, header) {
+	if err != nil {
 		return err
 	}
 
-	fWithHeaderRemoved := stripHeader(f, license)
+	fWithHeaderRemoved := stripHeader(f, header)
 
 	// When we write the file, we need to preserve the file mode.
 	info, err := os.Stat(path)
@@ -246,6 +246,6 @@ func hasLicenseHeader(file []byte, header []byte) bool {
 	return bytes.Contains(file, header)
 }
 
-func stripHeader(file []byte, license []byte) []byte {
-	return bytes.ReplaceAll(file, license, []byte{})
+func stripHeader(file []byte, header []byte) []byte {
+	return bytes.ReplaceAll(file, header, []byte(""))
 }

@@ -168,5 +168,6 @@ func main() {
 	}
 
 	rootCmd.AddCommand(cmdAdd())
+	rootCmd.AddCommand(cmdRemove())
 	rootCmd.Execute()
 }

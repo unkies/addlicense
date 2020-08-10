@@ -34,7 +34,7 @@ import (
 )
 
 func TestRemove(t *testing.T) {
-	testdataDir := filepath.Join("testdata", "add")
+	testdataDir := filepath.Join("testdata", "remove")
 	initialPath := filepath.Join(testdataDir, "initial")
 	expectPath := filepath.Join(testdataDir, "expected")
 	licensePath := filepath.Join(testdataDir, "test_license")
@@ -45,9 +45,9 @@ func TestRemove(t *testing.T) {
 
 	license, err := ioutil.ReadFile(licensePath)
 	assert.NoError(t, err, "Failed to read license for testing")
-	assert.NoError(t, RemoveLicense(testDir, license, []string{"ignore"}), "Failed to add license")
+	assert.NoError(t, RemoveLicense(testDir, license, []string{"ignore"}), "Failed to remove license")
 
-	assert.NoError(t, compDir(testDir, expectPath), "")
+	assert.NoError(t, compDir(testDir, expectPath), "Actual and expects are different")
 
 	os.RemoveAll(testDir)
 }
@@ -66,7 +66,7 @@ func TestAdd(t *testing.T) {
 	assert.NoError(t, err, "Failed to read license for testing")
 	assert.NoError(t, AddLicense(testDir, license, []string{"ignore"}), "Failed to add license")
 
-	assert.NoError(t, compDir(testDir, expectPath), "")
+	assert.NoError(t, compDir(testDir, expectPath), "Actual and expects are different")
 
 	os.RemoveAll(testDir)
 }
@@ -108,7 +108,7 @@ func compDir(result string, expected string) error {
 		}
 
 		fname := filepath.Base(path)
-		result, err := ioutil.ReadFile(filepath.Join(result, fname))
+		actual, err := ioutil.ReadFile(filepath.Join(result, fname))
 		if err != nil {
 			return errors.Wrap(err, "Failed to read the result file")
 		}
@@ -118,8 +118,8 @@ func compDir(result string, expected string) error {
 			return errors.Wrap(err, "Failed to read the expect file")
 		}
 
-		if bytes.Compare(result, expect) != 0 {
-			return errors.Wrap(err, "The result file is different from expected")
+		if bytes.Compare(actual, expect) != 0 {
+			return errors.Errorf("The result file [%s] is different from expected", fname)
 		}
 
 		return nil
