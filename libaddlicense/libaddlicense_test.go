@@ -29,10 +29,11 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestAll(t *testing.T) {
+func TestRemove(t *testing.T) {
 	testdataDir := filepath.Join("testdata", "add")
 	initialPath := filepath.Join(testdataDir, "initial")
 	expectPath := filepath.Join(testdataDir, "expected")
@@ -40,8 +41,38 @@ func TestAll(t *testing.T) {
 
 	testDir, err := ioutil.TempDir("/tmp", "addlicense_test_")
 	assert.NoError(t, err, "Failed to create a testing directory")
+	assert.NoError(t, copyDir(initialPath, testDir), "Failed to copy initial files to test dir")
 
-	if err := filepath.Walk(initialPath, func(path string, f os.FileInfo, err error) error {
+	license, err := ioutil.ReadFile(licensePath)
+	assert.NoError(t, err, "Failed to read license for testing")
+	assert.NoError(t, RemoveLicense(testDir, license, []string{"ignore"}), "Failed to add license")
+
+	assert.NoError(t, compDir(testDir, expectPath), "")
+
+	os.RemoveAll(testDir)
+}
+
+func TestAdd(t *testing.T) {
+	testdataDir := filepath.Join("testdata", "add")
+	initialPath := filepath.Join(testdataDir, "initial")
+	expectPath := filepath.Join(testdataDir, "expected")
+	licensePath := filepath.Join(testdataDir, "test_license")
+
+	testDir, err := ioutil.TempDir("/tmp", "addlicense_test_")
+	assert.NoError(t, err, "Failed to create a testing directory")
+	assert.NoError(t, copyDir(initialPath, testDir), "Failed to copy initial files to test dir")
+
+	license, err := ioutil.ReadFile(licensePath)
+	assert.NoError(t, err, "Failed to read license for testing")
+	assert.NoError(t, AddLicense(testDir, license, []string{"ignore"}), "Failed to add license")
+
+	assert.NoError(t, compDir(testDir, expectPath), "")
+
+	os.RemoveAll(testDir)
+}
+
+func copyDir(src string, dest string) error {
+	return filepath.Walk(src, func(path string, f os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -51,7 +82,7 @@ func TestAll(t *testing.T) {
 		}
 
 		fname := filepath.Base(path)
-		testFile := filepath.Join(testDir, fname)
+		testFile := filepath.Join(dest, fname)
 
 		input, err := ioutil.ReadFile(path)
 		if err != nil {
@@ -63,15 +94,11 @@ func TestAll(t *testing.T) {
 		}
 
 		return nil
-	}); err != nil {
-		assert.NoError(t, err, "Failed to walk")
-	}
+	})
+}
 
-	license, err := ioutil.ReadFile(licensePath)
-	assert.NoError(t, err, "Failed to read license for testing")
-	assert.NoError(t, AddLicenseWithIgnore(testDir, license, []string{"ignore"}), "Failed to add license")
-
-	if err := filepath.Walk(testDir, func(path string, f os.FileInfo, err error) error {
+func compDir(result string, expected string) error {
+	return filepath.Walk(result, func(path string, f os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -81,19 +108,20 @@ func TestAll(t *testing.T) {
 		}
 
 		fname := filepath.Base(path)
-		result, err := ioutil.ReadFile(filepath.Join(testDir, fname))
-		assert.NoError(t, err, "Failed to read the result file")
+		result, err := ioutil.ReadFile(filepath.Join(result, fname))
+		if err != nil {
+			return errors.Wrap(err, "Failed to read the result file")
+		}
 
-		expect, err := ioutil.ReadFile(filepath.Join(expectPath, fname))
-		assert.NoError(t, err, "Failed to read the expect file")
+		expect, err := ioutil.ReadFile(filepath.Join(expected, fname))
+		if err != nil {
+			return errors.Wrap(err, "Failed to read the expect file")
+		}
 
-		ret := bytes.Compare(result, expect)
-		assert.Equal(t, 0, ret, "The result file is different from expected")
+		if bytes.Compare(result, expect) != 0 {
+			return errors.Wrap(err, "The result file is different from expected")
+		}
 
 		return nil
-	}); err != nil {
-		assert.FailNow(t, "Failed to walk")
-	}
-
-	os.RemoveAll(testDir)
+	})
 }

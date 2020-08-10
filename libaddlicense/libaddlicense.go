@@ -37,10 +37,7 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-// AddLicenseWithIgnore will add license to all files under the root, except
-// path that matches the ignore patterns. The pattern used are regex patterns
-// and match is implemented using golang regexp package.
-func AddLicenseWithIgnore(root string, license []byte, ignore []string) error {
+func processLicense(root string, license []byte, ignore []string, processFunc func(string, []byte) error) error {
 	var wg errgroup.Group
 
 	if err := filepath.Walk(root, func(path string, f os.FileInfo, err error) error {
@@ -65,7 +62,7 @@ func AddLicenseWithIgnore(root string, license []byte, ignore []string) error {
 		}
 
 		wg.Go(func() error {
-			return AddLicenseSingle(path, license)
+			return processFunc(path, license)
 		})
 		return nil
 	}); err != nil {
@@ -79,15 +76,19 @@ func AddLicenseWithIgnore(root string, license []byte, ignore []string) error {
 	return nil
 }
 
-// AddLicense adds license to all files under the root. It will try to parse the
-// file extension and add the right header accordingly. It will also handle
-// shebang lines correctly.
-func AddLicense(root string, license []byte) error {
-	return AddLicenseWithIgnore(root, license, []string{})
+// RemoveLicense ...
+func RemoveLicense(root string, license []byte, ignore []string) error {
+	return processLicense(root, license, ignore, removeLicense)
 }
 
-// AddLicenseSingle add the license to a single file in path.
-func AddLicenseSingle(path string, license []byte) error {
+// AddLicense will add license to all files under the root, except
+// path that matches the ignore patterns. The pattern used are regex patterns
+// and match is implemented using golang regexp package.
+func AddLicense(root string, license []byte, ignore []string) error {
+	return processLicense(root, license, ignore, addLicense)
+}
+
+func addLicense(path string, license []byte) error {
 	header, err := licenseHeader(path, license)
 	if err != nil || header == nil {
 		return errors.Wrap(err, "Failed to create a header from the license")
@@ -119,6 +120,32 @@ func AddLicenseSingle(path string, license []byte) error {
 	}
 
 	if err := ioutil.WriteFile(path, f, info.Mode()); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func removeLicense(path string, license []byte) error {
+	header, err := licenseHeader(path, license)
+	if err != nil || header == nil {
+		return errors.Wrap(err, "Failed to create a header from the license")
+	}
+
+	f, err := ioutil.ReadFile(path)
+	if err != nil || hasLicenseHeader(f, header) {
+		return err
+	}
+
+	fWithHeaderRemoved := stripHeader(f, license)
+
+	// When we write the file, we need to preserve the file mode.
+	info, err := os.Stat(path)
+	if err != nil {
+		return err
+	}
+
+	if err := ioutil.WriteFile(path, fWithHeaderRemoved, info.Mode()); err != nil {
 		return err
 	}
 
