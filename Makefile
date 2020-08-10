@@ -13,7 +13,7 @@ dogfood_add: bin/addlicense
 	./bin/addlicense add --license LICENSE --ignore testdata .
 
 .PHONY: dogfood_remove
-dogfood_add: bin/addlicense
+dogfood_remove: bin/addlicense
 	./bin/addlicense remove --license LICENSE --ignore testdata .
 
 .PHONY: test
