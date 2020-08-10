@@ -31,31 +31,15 @@ import (
 	"github.com/unkies/addlicense/libaddlicense"
 )
 
-func main() {
-	rootCmd := &cobra.Command{
-		Use:   "addlicense [flags] path...",
-		Short: "CLI used to add license to source files",
+func cmdAdd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "add [flags] path...",
+		Short: "Add license to source files",
 	}
 
-	rootCmd.PersistentFlags().Bool("debug", false, "Enable debug logging")
-	rootCmd.PersistentPreRunE = func(c *cobra.Command, args []string) error {
-		logrus.SetReportCaller(true)
-		debug, err := c.Flags().GetBool("debug")
-		if err != nil {
-			return err
-		}
-
-		if debug {
-			logrus.SetLevel(logrus.DebugLevel)
-		}
-
-		return nil
-	}
-
-	rootCmd.PersistentFlags().String("license", "", "Path to license file")
-	rootCmd.PersistentFlags().StringArray("ignore", []string{}, "Patterns to ignore. Follow the shell pattern")
-	rootCmd.Args = cobra.MinimumNArgs(1)
-	rootCmd.RunE = func(c *cobra.Command, args []string) error {
+	cmd.PersistentFlags().String("license", "", "Path to license file")
+	cmd.PersistentFlags().StringArray("ignore", []string{}, "Patterns to ignore. Follow the shell pattern")
+	cmd.RunE = func(c *cobra.Command, args []string) error {
 		licensePath, err := c.Flags().GetString("license")
 		if err != nil {
 			return err
@@ -86,6 +70,31 @@ func main() {
 		return nil
 	}
 
+	return cmd
+}
+
+func main() {
+	rootCmd := &cobra.Command{
+		Use:   "addlicense [commands]",
+		Short: "CLI used to add license to source files",
+	}
+
+	rootCmd.PersistentFlags().Bool("debug", false, "Enable debug logging")
+	rootCmd.PersistentPreRunE = func(c *cobra.Command, args []string) error {
+		logrus.SetReportCaller(true)
+		debug, err := c.Flags().GetBool("debug")
+		if err != nil {
+			return err
+		}
+
+		if debug {
+			logrus.SetLevel(logrus.DebugLevel)
+		}
+
+		return nil
+	}
+
+	rootCmd.AddCommand(cmdAdd())
 	rootCmd.Execute()
 }
 
