@@ -35,7 +35,7 @@ import (
 func TestAll(t *testing.T) {
 	initialPath := filepath.Join("testdata", "initial")
 	expectPath := filepath.Join("testdata", "expected")
-	licensePath := filepath.Join("testdata", "license.txt")
+	licensePath := filepath.Join("testdata", "test_license")
 
 	testDir, err := ioutil.TempDir("/tmp", "addlicense_test_")
 	assert.NoError(t, err, "Failed to create a testing directory")
