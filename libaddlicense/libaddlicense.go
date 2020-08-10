@@ -37,6 +37,10 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
+// processLicense is the framework to walk through the directories and files
+// under root to process the license. If the file is a directory, walk every
+// files under the directory, except the ignore. If the it's a file, then
+// directly runs processFunc. If the root is a file, ignore has to be empty.
 func processLicense(root string, license []byte, ignore []string, processFunc func(string, []byte) error) error {
 
 	rootStat, err := os.Lstat(root)
@@ -89,14 +93,18 @@ func processLicense(root string, license []byte, ignore []string, processFunc fu
 	return nil
 }
 
-// RemoveLicense ...
+// RemoveLicense will strip the license from files under the root, except path
+// that matches the ignore patterns. The pattern used are regex patterns and
+// match is implemented using golang regexp package.
+// Note: The root can point to a file, but ignore pattern needs to be empty.
 func RemoveLicense(root string, license []byte, ignore []string) error {
 	return processLicense(root, license, ignore, removeLicense)
 }
 
-// AddLicense will add license to all files under the root, except
-// path that matches the ignore patterns. The pattern used are regex patterns
-// and match is implemented using golang regexp package.
+// AddLicense will add license to all files under the root, except path that
+// matches the ignore patterns. The pattern used are regex patterns and match is
+// implemented using golang regexp package.
+// Note: The root can point to a file, but ignore pattern needs to be empty.
 func AddLicense(root string, license []byte, ignore []string) error {
 	return processLicense(root, license, ignore, addLicense)
 }
