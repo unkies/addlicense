@@ -11,3 +11,7 @@ clean:
 .PHONY: dogfood
 dogfood: bin/addlicense
 	./bin/addlicense --license LICENSE --ignore testdata .
+
+.PHONY: test
+test:
+	go test -v ./...
