@@ -38,8 +38,21 @@ import (
 )
 
 func processLicense(root string, license []byte, ignore []string, processFunc func(string, []byte) error) error {
-	var wg errgroup.Group
 
+	rootStat, err := os.Lstat(root)
+	if err != nil {
+		return errors.Wrap(err, "Failed to access the root")
+	}
+
+	if !rootStat.IsDir() {
+		if len(ignore) > 0 {
+			return errors.New("Can't process a file with ignore")
+		}
+
+		return processFunc(root, license)
+	}
+
+	var wg errgroup.Group
 	if err := filepath.Walk(root, func(path string, f os.FileInfo, err error) error {
 		if err != nil {
 			return errors.Wrap(err, "Failed to walk the path")

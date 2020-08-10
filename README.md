@@ -68,6 +68,9 @@ _ := libaddlicense.AddLicense(srcRoot, license, ignore)
 // Or no need to ignore
 _ := libaddlicense.AddLicense(srcRoot, license, []string{})
 
+// To add a license to a file
+_ := libaddlicense.AddLicense(path, license, []string{})
+
 ```
 
 ## License
