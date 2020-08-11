@@ -71,6 +71,7 @@ _ := libaddlicense.AddLicense(srcRoot, license, ignore)
 _ := libaddlicense.AddLicense(srcRoot, license, []string{})
 
 // To add a license to a file
+path := "somepath/somefile.go"
 _ := libaddlicense.AddLicense(path, license, []string{})
 
 ```
