@@ -34,6 +34,7 @@ import (
 	"unicode"
 
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -53,6 +54,9 @@ func processLicense(root string, license []byte, ignore []string, processFunc fu
 			return errors.New("Can't process a file with ignore")
 		}
 
+		logrus.WithFields(logrus.Fields{
+			"path": root,
+		}).Debug("process a single path")
 		return processFunc(root, license)
 	}
 
@@ -79,6 +83,10 @@ func processLicense(root string, license []byte, ignore []string, processFunc fu
 		}
 
 		wg.Go(func() error {
+			logrus.WithFields(logrus.Fields{
+				"path": path,
+			}).Debug("process a path after not on the ignore list")
+
 			return processFunc(path, license)
 		})
 		return nil
