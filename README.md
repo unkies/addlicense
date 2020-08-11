@@ -23,7 +23,7 @@ make
 
 ## Test
 ```bash
-go test -v ./...
+make test
 ```
 
 ## Usage
@@ -45,11 +45,13 @@ go clean -i github.com/unkies/addlicense/cmd/addlicense
 To use, first create a file with the license header you want to add. See
 `./LICENSE` as an example of the MIT license.
 ```bash
-addlicense --license <license file> --ignore <if any ignore patterns> <root of source code>
+addlicense add --license <license file> --ignore <if any ignore patterns> <root of source code>
 ```
 
-For usage, consult `addlicense -h` and `make dogfood` as an example of adding
-`./LICENSE` to this repo.
+For usage, consult `addlicense -h` and `make dogfood_add` as an example of
+adding `./LICENSE` to this repo. For example to remove license headers, see
+`make dogfood_remove`.
+
 
 ### Lib
 
